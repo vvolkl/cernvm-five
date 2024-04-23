@@ -1,6 +1,6 @@
 ### This file is part of CernVM 5. ### 
-### Build Stage, preparing a EL8-based builder container ###
-FROM gitlab-registry.cern.ch/linuxsupport/cs9-base AS builder
+### Build Stage, preparing a EL9-based builder container ###
+FROM gitlab-registry.cern.ch/linuxsupport/alma9-base AS builder
 ENV BUILD_DIR=/build 
 WORKDIR /
 
