@@ -20,6 +20,7 @@ RUN dnf install autoconf \
     grep          \
     https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm  \
     https://linuxsoft.cern.ch/wlcg/el9/x86_64/wlcg-repo-1.0.0-1.el9.noarch.rpm      \
+    https://research.cs.wisc.edu/htcondor/repo/current/htcondor-release-current.el9.noarch.rpm \
     libtool       \
     make          \
     wget          \
@@ -53,13 +54,21 @@ RUN mkdir $BUILD_DIR/data
 
 ### Final Stage ###
 ### Copying /build to scratch ###
-FROM scratch AS cernvm
+FROM scratch 
 ONBUILD RUN echo "Consider to include /etc/cernvm/patch.sh in your build."
 COPY --from=builder /build /
 LABEL FORUM="https://cernvm-forum.cern.ch/"
 LABEL MAINTAINER="Jakob Eberhardt jakob.karl.eberhardt@cern.ch, Jakob Blomer jblomer@cern.ch" 
 LABEL io.k8s.display-name="CernVM" 
 LABEL io.k8s.description="A container image providing CernVM-FS and HEP_OSlibs"
+
+COPY config/etc/cloud/cloud.cfg /etc/cloud/cloud.cfg
+RUN passwd -d root 
+RUN echo "NETWORKING=yes" >> /etc/sysconfig/network && mkdir -p /etc/sysconfig/network-scripts/ && \
+    echo -e 'DEVICE="eth0"\nONBOOT="yes"\nBOOTPROTO="dhcp"\n' > /etc/sysconfig/network-scripts/ifcfg-eth0
+RUN rm -rf /etc/selinux/targeted /etc/selinux/config
+RUN dnf -y install NetworkManager
+RUN systemctl enable NetworkManager 
 EXPOSE 8888
 STOPSIGNAL SIGTERM
 WORKDIR /

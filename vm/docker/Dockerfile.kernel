@@ -12,8 +12,6 @@ RUN systemctl enable NetworkManager && \
     systemctl set-default graphical.target
 COPY config/etc/cloud/cloud.cfg /etc/cloud/cloud.cfg
 
-RUN echo "NETWORKING=yes" >> /etc/sysconfig/network && \
-    echo -e 'DEVICE="eth0"\nONBOOT="yes"\nBOOTPROTO="dhcp"\n' > /etc/sysconfig/network-scripts/ifcfg-eth0
 
 ### Create init ram disk ### 
 RUN dracut -v --no-hostonly --regenerate-all --force
@@ -25,5 +23,4 @@ RUN ln -s $(find / -name 'vmlinuz*') vmlinuz && \
 WORKDIR /
 
 ### Remove SELinux policys ###
-RUN rm -rf /etc/selinux/targeted /etc/selinux/config
 LABEL MAINTAINER="Jakob Eberhardt jakob.karl.eberhardt@cern.ch, Jakob Blomer jblomer@cern.ch"
